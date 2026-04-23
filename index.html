@@ -206,7 +206,7 @@ var SCHED = {
   1:{label:"PUSH",        color:"#FF6B35"},
   2:{label:"PULL",        color:"#4ECDC4"},
   3:{label:"LEGS",        color:"#FFE66D"},
-  4:{label:"PUSH + PULL", color:"#C77DFF"},
+  4:{label:"CARDIO MATIN", color:"#38BDF8"},
   6:{label:"CARDIO GR",   color:"#6FCF97"}
 };
 
@@ -214,7 +214,7 @@ var MUSCLES = {
   "PUSH":        {"Pectoraux":40,"Épaules":35,"Triceps":25},
   "PULL":        {"Dos":50,"Biceps":35,"Trapèzes":15},
   "LEGS":        {"Quadriceps":30,"Ischio":25,"Fessiers":30,"Mollets":15},
-  "PUSH + PULL": {"Pectoraux":20,"Épaules":15,"Triceps":15,"Dos":25,"Biceps":25},
+  "CARDIO MATIN":  {"Cardio":60,"Mollets":20,"Ischio":20},
   "CARDIO GR":   {"Cardio":60,"Mollets":20,"Quadriceps":20}
 };
 
@@ -244,14 +244,10 @@ var SEX = {
     {n:"Hip thrust barre",              t:"3×12-15 · squeeze en haut"},
     {n:"Machine adducteur",             t:"3×15-20 · face intérieure cuisse"}
   ],
-  "PUSH + PULL":[
-    {n:"Développé couché haltères",     t:"Push · 3×10-12"},
-    {n:"Développé incliné barre",       t:"Push · 3×8-10"},
-    {n:"Élévations latérales câble",    t:"Push · 3×15-20"},
-    {n:"Dips",                          t:"Push · 3×12"},
-    {n:"Tractions supination",          t:"Pull · 3×8-10"},
-    {n:"Curl biceps haltères alterné",  t:"Pull · 3×12 par côté"},
-    {n:"Extensions triceps crâne",      t:"Push · 3×12"}
+  "CARDIO MATIN":[
+    {n:"Marche rapide tapis",            t:"20 min · vitesse 3.2 · inclinaison 8"},
+    {n:"Escalier",                       t:"20 min · niveau 8 · ~1450 marches"},
+    {n:"Course tapis",                   t:"20 min · vitesse 6.5"}
   ],
   "CARDIO GR":[
     {n:"Marche inclinée tapis",         t:"30-60 min · inclinaison progressive"},
@@ -309,10 +305,10 @@ var DAILY_MISSIONS = {
     {id:"dm_lg2", t:"Hip thrust > 60 kg", xp:30},
     {id:"dm_lg3", t:"Complète les 6 exercices", xp:25}
   ],
-  "PUSH + PULL":[
-    {id:"dm_pp1", t:"Session terminée en moins de 75 min", xp:30},
-    {id:"dm_pp2", t:"Bats un record sur un exercice Push", xp:30},
-    {id:"dm_pp3", t:"Bats un record sur un exercice Pull", xp:30}
+  "CARDIO MATIN":[
+    {id:"dm_cm1", t:"Enchaîne les 3 blocs sans pause", xp:40},
+    {id:"dm_cm2", t:"Dépasse 1400 marches à l'escalier", xp:30},
+    {id:"dm_cm3", t:"Augmente la vitesse de course à 7+", xp:25}
   ],
   "CARDIO GR":[
     {id:"dm_c1", t:"30 min minimum de marche inclinée", xp:40},
@@ -1133,7 +1129,7 @@ function renderProgram(){
     {label:"PUSH",        color:"#FF6B35", focus:"Pec · Épaules · Triceps"},
     {label:"PULL",        color:"#4ECDC4", focus:"Dos · Biceps · Trapèzes"},
     {label:"LEGS",        color:"#FFE66D", focus:"Quadri · Ischio · Fessiers"},
-    {label:"PUSH + PULL", color:"#C77DFF", focus:"Session mixte complète"},
+    {label:"CARDIO MATIN", color:"#38BDF8", focus:"Marche · Escalier · Course · 60 min enchaîné"},
     null,
     {label:"CARDIO GR",   color:"#6FCF97", focus:"Marche inclinée · Prépa randonnée"},
     null
@@ -1205,7 +1201,7 @@ function renderProgram(){
 
   return '<div class="ai" style="padding:24px 14px">'
     +'<div class="bb" style="font-size:34px;letter-spacing:3px;margin-bottom:2px">PROGRAMME</div>'
-    +'<div class="bc" style="font-size:10px;color:#444;letter-spacing:2px;margin-bottom:16px">STEIL · MASSE + GR PREP · 5 JOURS/SEM</div>'
+    +'<div class="bc" style="font-size:10px;color:#444;letter-spacing:2px;margin-bottom:16px">STEIL · MASSE + GR PREP · LUN/MAR/MER/JEU/SAM</div>'
     +weekH+detH+grH+grck+tips2.join('')
     +'</div>';
 }
