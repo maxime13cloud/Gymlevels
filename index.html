@@ -206,16 +206,18 @@ var SCHED = {
   1:{label:"PUSH",        color:"#FF6B35"},
   2:{label:"PULL",        color:"#4ECDC4"},
   3:{label:"LEGS",        color:"#FFE66D"},
-  4:{label:"CARDIO MATIN", color:"#38BDF8"},
+  4:{label:"PUSH + PULL", color:"#C77DFF"},
   6:{label:"CARDIO GR",   color:"#6FCF97"}
 };
+var AVANT_BRAS_DAYS = null; // soir sur 2, basé sur parité du jour
 
 var MUSCLES = {
   "PUSH":        {"Pectoraux":40,"Épaules":35,"Triceps":25},
   "PULL":        {"Dos":50,"Biceps":35,"Trapèzes":15},
   "LEGS":        {"Quadriceps":30,"Ischio":25,"Fessiers":30,"Mollets":15},
-  "CARDIO MATIN":  {"Cardio":60,"Mollets":20,"Ischio":20},
-  "CARDIO GR":   {"Cardio":60,"Mollets":20,"Quadriceps":20}
+  "PUSH + PULL": {"Pectoraux":20,"Épaules":15,"Triceps":15,"Dos":25,"Biceps":25},
+  "CARDIO GR":   {"Cardio":60,"Mollets":20,"Quadriceps":20},
+  "AVANT-BRAS":  {"Avant-bras":60,"Préhension":30,"Poignets":10}
 };
 
 var SEX = {
@@ -244,15 +246,25 @@ var SEX = {
     {n:"Hip thrust barre",              t:"3×12-15 · squeeze en haut"},
     {n:"Machine adducteur",             t:"3×15-20 · face intérieure cuisse"}
   ],
-  "CARDIO MATIN":[
-    {n:"Marche rapide tapis",            t:"20 min · vitesse 3.2 · inclinaison 8"},
-    {n:"Escalier",                       t:"20 min · niveau 8 · ~1450 marches"},
-    {n:"Course tapis",                   t:"20 min · vitesse 6.5"}
+  "PUSH + PULL":[
+    {n:"Développé couché haltères",     t:"Push · 3×10-12"},
+    {n:"Développé incliné barre",       t:"Push · 3×8-10"},
+    {n:"Élévations latérales câble",    t:"Push · 3×15-20"},
+    {n:"Dips",                          t:"Push · 3×12"},
+    {n:"Tractions supination",          t:"Pull · 3×8-10"},
+    {n:"Curl biceps haltères alterné",  t:"Pull · 3×12 par côté"},
+    {n:"Extensions triceps crâne",      t:"Push · 3×12"}
   ],
   "CARDIO GR":[
     {n:"Marche inclinée tapis",         t:"30-60 min · inclinaison progressive"},
     {n:"Montées escaliers lestées",     t:"20 min · sac à dos"},
     {n:"Vélo endurance",               t:"30 min · zone 2 cardiaque"}
+  ],
+  "AVANT-BRAS":[
+    {n:"Dead hang",                     t:"3-4 séries · tiens le max · repos 2 min"},
+    {n:"Pronation haltère",             t:"3×15-20 · poignet tourne paume vers le bas"},
+    {n:"Supination haltère",            t:"3×15-20 · poignet tourne paume vers le haut"},
+    {n:"Flexion du poignet",            t:"3×20 · ramène la main vers l'avant-bras"}
   ]
 };
 
@@ -263,7 +275,8 @@ var ALL_EX = {
   "Biceps":["Curl biceps barre EZ","Curl biceps haltères alterné","Curl marteau haltères","Curl câble concentré"],
   "Triceps":["Extensions triceps poulie","Extensions triceps crâne","Dips","Kickback haltère"],
   "Jambes":["Presse à cuisses 45°","Leg curl couché","Leg extension","Développé roumain haltères","Hip thrust barre","Machine adducteur","Mollets debout machine"],
-  "Cardio":["Marche inclinée tapis","Vélo endurance","Rameur","Corde à sauter","Montées escaliers lestées"]
+  "Cardio":["Marche inclinée tapis","Vélo endurance","Rameur","Corde à sauter","Montées escaliers lestées"],
+  "Avant-bras":["Dead hang","Pronation haltère","Supination haltère","Flexion du poignet","Extension du poignet","Farmer carry"]
 };
 
 var TIPS = {
@@ -286,13 +299,11 @@ var TIPS = {
   "Développé roumain haltères":   {m:"Ischio-jambiers, fessiers, bas du dos", e:"Jambes semi-fléchies. Descente en gardant le dos plat. Montée en poussant les hanches.", err:"Ne pas arrondir le dos. Ne pas plier trop les genoux.", p:"Descente jusqu'à sentir l'étirement ischio. Contrôle total."},
   "Hip thrust barre":             {m:"Fessiers (grand et moyen), ischio", e:"Dos sur banc. Extension complète. Squeeze fessiers 1s en haut.", err:"Ne pas hyperextendre le bas du dos. Garder le menton rentré.", p:"Exercice roi des fessiers. Charge lourde possible."},
   "Machine adducteur":            {m:"Adducteurs, face intérieure cuisse", e:"Serrer lentement. Excentrique contrôlé. ROM complet.", err:"Ne pas aller trop vite.", p:"Stabilisateurs du genou. Utile pour la rando aussi."},
+  "Dead hang":                    {m:"Avant-bras, préhension, doigts, épaules passives", e:"Suspens-toi à la barre, prise pronation ou neutre. Corps détendu. Respire normalement. Tiens le plus longtemps possible.", err:"Ne pas se crisper sur les épaules. Ne pas balancer.", p:"Note ton temps à chaque série. Objectif : 60s puis 90s puis 2 min."},
+  "Pronation haltère":            {m:"Rond pronateur, carré pronateur, avant-bras externe", e:"Coude posé sur la cuisse ou un banc. Paume vers le haut au départ, tourne vers le bas lentement.", err:"Ne pas bouger le coude. Mouvement pur du poignet.", p:"Léger au début (2-4 kg). C'est le mouvement pour coucher le bras en bras de fer."},
+  "Supination haltère":           {m:"Biceps brachial, supinateur, avant-bras interne", e:"Coude posé. Paume vers le bas au départ, tourne vers le haut. Contrôle total.", err:"Ne pas aider avec l'épaule.", p:"Mouvement opposé à la pronation. Travaille les deux à chaque séance."},
+  "Flexion du poignet":           {m:"Fléchisseurs du poignet, avant-bras interne", e:"Coude sur la cuisse, paume vers le haut. Ramène la main vers toi lentement. Redescends complètement.", err:"Trop de poids trop tôt. ROM complet obligatoire.", p:"Force de crochet en bras de fer. Commence à 5 kg, progresse doucement."},
   "Marche inclinée tapis":        {m:"Mollets, ischio, fessiers, cardio", e:"Inclinaison 6-12%. Allure soutenue. Dos droit, ne pas s'accrocher aux barres.", err:"Ne pas tenir les barres latérales (ça annule l'effort).", p:"Pour la prépa GR : ajoute progressivement un sac lesté."}
-};
-
-var CARDIO_EX = {
-  "Marche rapide tapis": [{k:'duree',label:'DURÉE',unit:'min'},{k:'vitesse',label:'VITESSE',unit:'km/h'},{k:'incl',label:'INCLIN.',unit:'%'}],
-  "Escalier":            [{k:'duree',label:'DURÉE',unit:'min'},{k:'niveau',label:'NIVEAU',unit:''},{k:'marches',label:'MARCHES',unit:''}],
-  "Course tapis":        [{k:'duree',label:'DURÉE',unit:'min'},{k:'vitesse',label:'VITESSE',unit:'km/h'}]
 };
 
 var DAILY_MISSIONS = {
@@ -311,10 +322,15 @@ var DAILY_MISSIONS = {
     {id:"dm_lg2", t:"Hip thrust > 60 kg", xp:30},
     {id:"dm_lg3", t:"Complète les 6 exercices", xp:25}
   ],
-  "CARDIO MATIN":[
-    {id:"dm_cm1", t:"Enchaîne les 3 blocs sans pause", xp:40},
-    {id:"dm_cm2", t:"Dépasse 1400 marches à l'escalier", xp:30},
-    {id:"dm_cm3", t:"Augmente la vitesse de course à 7+", xp:25}
+  "PUSH + PULL":[
+    {id:"dm_pp1", t:"Session terminée en moins de 75 min", xp:30},
+    {id:"dm_pp2", t:"Bats un record sur un exercice Push", xp:30},
+    {id:"dm_pp3", t:"Bats un record sur un exercice Pull", xp:30}
+  ],
+  "AVANT-BRAS":[
+    {id:"dm_ab1", t:"Dead hang : bats ton record de temps", xp:35},
+    {id:"dm_ab2", t:"Complète pronation + supination + flexion", xp:25},
+    {id:"dm_ab3", t:"4 séries de dead hang complétées", xp:20}
   ],
   "CARDIO GR":[
     {id:"dm_c1", t:"30 min minimum de marche inclinée", xp:40},
@@ -375,7 +391,7 @@ var restIv = null;
 var restSec = 0;
 var statEx = null;
 var openDay = null;
-var np = {open:false, ei:-1, si:-1, f:'w', drop:false, cardio:false, val:''};
+var np = {open:false, ei:-1, si:-1, f:'w', drop:false, val:''};
 
 function loadDB(){
   try{
@@ -438,6 +454,35 @@ function prevWeekW(){ return db.workouts.filter(function(w){var d=Date.now()-new
 function todayKey(){ return new Date().toDateString(); }
 function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function fmt(n){ return n%1===0?String(n):n.toFixed(1); }
+
+// ═══════════════════════════════════════════════════════════
+// AVANT-BRAS SOIR SUR 2
+// ═══════════════════════════════════════════════════════════
+function isAvantBrasDay(){
+  // Alterne chaque jour (pair = avant-bras soir)
+  return Math.floor(Date.now()/86400000)%2===0;
+}
+function startAvantBras(){
+  var exs=SEX["AVANT-BRAS"].map(function(e){return{n:e.n,t:e.t,sets:[{w:0,r:30,done:false},{w:0,r:30,done:false},{w:0,r:30,done:false}]};});
+  startSess("AVANT-BRAS · Soir","AVANT-BRAS",exs);
+}
+function renderAvantBras(){
+  var isDay=isAvantBrasDay();
+  var dk=todayKey();
+  var doneToday=db.workouts.some(function(w){return w.st==="AVANT-BRAS"&&new Date(w.date).toDateString()===dk;});
+  if(doneToday) return '<div class="card" style="background:#0A0A0A;border-color:#1C2A1C;margin-bottom:10px"><div style="display:flex;align-items:center;gap:10px"><span style="font-size:20px">✅</span><div><div class="bb" style="font-size:14px;color:#6FCF97;letter-spacing:2px">AVANT-BRAS</div><div class="bc" style="font-size:10px;color:#3A3A3A;letter-spacing:1px">Séance du soir complétée</div></div></div></div>';
+  if(!isDay) return '<div class="card" style="background:#0A0A0A;margin-bottom:10px"><div style="display:flex;justify-content:space-between;align-items:center"><div><div class="bb" style="font-size:14px;color:#3A3A3A;letter-spacing:2px">AVANT-BRAS</div><div class="bc" style="font-size:10px;color:#2A2A2A;letter-spacing:1px">Repos ce soir · Demain soir</div></div><span style="font-size:20px;opacity:.3">💪</span></div></div>';
+  return '<div class="card" style="background:#0C0E0A;border-color:#6FCF9740;margin-bottom:10px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
+    +'<div><div class="bc" style="font-size:9px;color:#6FCF97;letter-spacing:4px;margin-bottom:2px">CE SOIR · OPTIONNEL</div>'
+    +'<div class="bb" style="font-size:22px;color:#fff;letter-spacing:2px">AVANT-BRAS</div>'
+    +'<div class="bc" style="font-size:11px;color:#444;margin-top:2px">Dead hang · Pronation · Supination · Flexion</div></div>'
+    +'<span style="font-size:32px">💪</span></div>'
+    +'<div style="background:#181818;border-radius:4px;padding:10px 12px;margin-bottom:12px">'
+    +'<div class="bc" style="font-size:10px;color:#6FCF97;letter-spacing:1px;margin-bottom:4px">BRAS DE FER · POURQUOI CES EXERCICES</div>'
+    +'<div style="font-size:11px;color:#444;line-height:1.5">Pronation pour coucher le bras adverse · Supination pour résister · Flexion pour verrouiller la prise · Dead hang pour la préhension brute</div></div>'
+    +'<button class="btn" style="background:#6FCF97;color:#080808" onclick="startAvantBras()">LANCER LA SÉANCE SOIR</button></div>';
+}
 
 // ═══════════════════════════════════════════════════════════
 // ROUTING
@@ -566,6 +611,7 @@ function renderHome(){
     +grH
     +schedH
     +'<button class="btng" style="margin-bottom:12px" onclick="startFree()">+ SÉANCE LIBRE</button>'
+  +renderAvantBras()
     +nutrH
     +suppH
     +lastH
@@ -727,21 +773,12 @@ function getLastW(exName){
   }
   return 20;
 }
-function mkSets(exName, st){
-  if(st==='CARDIO MATIN' && CARDIO_EX[exName]){
-    var s={cardio:true,done:false};
-    if(exName==='Marche rapide tapis'){s.duree=20;s.vitesse=3.2;s.incl=8;}
-    else if(exName==='Escalier'){s.duree=20;s.niveau=8;s.marches=1451;}
-    else if(exName==='Course tapis'){s.duree=20;s.vitesse=6.5;}
-    return [s];
-  }
-  var w=getLastW(exName); return [{w:w,r:10,done:false},{w:w,r:10,done:false},{w:w,r:10,done:false}];
-}
+function mkSets(exName){ var w=getLastW(exName); return [{w:w,r:10,done:false},{w:w,r:10,done:false},{w:w,r:10,done:false}]; }
 
 function startScheduled(){
   var sc=SCHED[new Date().getDay()]; if(!sc)return;
   var exs=[]; var src=SEX[sc.label]||[];
-  for(var i=0;i<src.length;i++) exs.push({n:src[i].n,t:src[i].t,sets:mkSets(src[i].n, sc.label)});
+  for(var i=0;i<src.length;i++) exs.push({n:src[i].n,t:src[i].t,sets:mkSets(src[i].n)});
   startSess(sc.label+' · '+new Date().toLocaleDateString('fr-FR',{weekday:'long'}),sc.label,exs);
 }
 function startFree(){startSess('Séance libre','libre',[]);}
@@ -816,37 +853,15 @@ function updateSessUI(){
     if(hasTip) html+='<button onclick="showTips('+ei+')" style="background:none;border:1px solid #2A2A2A;color:#555;border-radius:4px;cursor:pointer;padding:4px 7px;font-size:10px;font-family:Barlow Condensed,sans-serif;letter-spacing:1px">TIPS</button>';
     html+='<button onclick="rmEx('+ei+')" style="background:none;border:none;color:#2A2A2A;cursor:pointer;padding:4px;font-size:16px">✕</button>';
     html+='</div></div>';
-    // Column headers (muscu only)
-    var isCardioSess = session.st==='CARDIO MATIN';
-    if(!isCardioSess){
-      html+='<div style="display:grid;grid-template-columns:26px 1fr 1fr 38px;gap:7px;margin-bottom:6px">';
-      html+='<div class="bc" style="font-size:9px;color:#2A2A2A;letter-spacing:1px;text-align:center">#</div>';
-      html+='<div class="bc" style="font-size:9px;color:#2A2A2A;letter-spacing:1px;text-align:center">KG</div>';
-      html+='<div class="bc" style="font-size:9px;color:#2A2A2A;letter-spacing:1px;text-align:center">REPS</div>';
-      html+='<div></div></div>';
-    }
+    // Column headers
+    html+='<div style="display:grid;grid-template-columns:26px 1fr 1fr 38px;gap:7px;margin-bottom:6px">';
+    html+='<div class="bc" style="font-size:9px;color:#2A2A2A;letter-spacing:1px;text-align:center">#</div>';
+    html+='<div class="bc" style="font-size:9px;color:#2A2A2A;letter-spacing:1px;text-align:center">KG</div>';
+    html+='<div class="bc" style="font-size:9px;color:#2A2A2A;letter-spacing:1px;text-align:center">REPS</div>';
+    html+='<div></div></div>';
     // Sets
     for(var si2=0;si2<ex.sets.length;si2++){
       var set=ex.sets[si2];
-      // ── CARDIO BLOCK ──
-      if(set.cardio){
-        var fields=CARDIO_EX[ex.n]||[];
-        var cols=fields.length;
-        html+='<div style="background:#0D0D0D;border:1px solid '+(set.done?'#38BDF840':'#1C1C1C')+';border-radius:8px;padding:12px;margin-bottom:10px">';
-        html+='<div style="display:grid;grid-template-columns:repeat('+cols+',1fr);gap:8px;margin-bottom:12px">';
-        for(var fi=0;fi<fields.length;fi++){
-          var fd=fields[fi], fval=set[fd.k]!==undefined?set[fd.k]:0;
-          html+='<div style="text-align:center">';
-          html+='<div class="bc" style="font-size:9px;color:#38BDF8;letter-spacing:2px;margin-bottom:5px">'+fd.label+'</div>';
-          html+='<button class="vbtn" style="border-color:#38BDF820;font-size:18px" onclick="openNP_cardio('+ei+','+si2+',\''+fd.k+'\')">';
-          html+=fmt(fval)+(fd.unit?'<span style="font-size:11px;color:#444;margin-left:3px">'+fd.unit+'</span>':'');
-          html+='</button></div>';
-        }
-        html+='</div>';
-        html+='<button onclick="togSet('+ei+','+si2+')" style="width:100%;background:'+(set.done?'#38BDF820':'#181818')+';border:1px solid '+(set.done?'#38BDF8':'#252525')+';border-radius:6px;padding:10px;cursor:pointer;font-family:Bebas Neue,sans-serif;letter-spacing:2px;font-size:14px;color:'+(set.done?'#38BDF8':'#444')+'">'+( set.done?'✓ TERMINÉ':'MARQUER COMME TERMINÉ')+'</button>';
-        html+='</div>';
-        continue;
-      }
       // Main phase
       html+='<div style="display:grid;grid-template-columns:26px 1fr 1fr 38px;gap:7px;align-items:center;margin-bottom:'+(set.drop?'4px':'8px')+';opacity:'+(set.done?.5:1)+'">';
       html+='<div class="bb" style="font-size:15px;color:#333;text-align:center">'+(si2+1)+'</div>';
@@ -866,7 +881,7 @@ function updateSessUI(){
         html+='<button onclick="addDrop('+ei+','+si2+')" style="background:none;border:none;color:#3A3A3A;cursor:pointer;font-family:Barlow Condensed,sans-serif;font-size:10px;letter-spacing:1px;margin-bottom:8px;padding:0 0 0 33px;display:block">+ DROP SET</button>';
       }
     }
-    if(!isCardioSess) html+='<button class="btng" style="margin-top:2px;font-size:12px;padding:7px 12px" onclick="addSet('+ei+')">+ SÉRIE</button>';
+    html+='<button class="btng" style="margin-top:2px;font-size:12px;padding:7px 12px" onclick="addSet('+ei+')">+ SÉRIE</button>';
     html+='</div>';
   }
   c.innerHTML=html;
@@ -958,17 +973,8 @@ function endSess(){
 // ═══════════════════════════════════════════════════════════
 // NUMPAD
 // ═══════════════════════════════════════════════════════════
-function openNP_cardio(ei,si,fk){
-  np.ei=ei;np.si=si;np.f=fk;np.drop=false;np.cardio=true;
-  var cur=session.exercises[ei].sets[si][fk];
-  np.val=String(cur!==undefined?cur:'0');
-  var labels={duree:'DURÉE (MIN)',vitesse:'VITESSE (KM/H)',incl:'INCLINAISON (%)',niveau:'NIVEAU',marches:'MARCHES'};
-  document.getElementById('np-label').textContent=labels[fk]||fk.toUpperCase();
-  document.getElementById('np-disp').textContent=np.val;
-  document.getElementById('numpad').classList.add('open');
-}
 function openNP(ei,si,f,isDrop){
-  np.ei=ei;np.si=si;np.f=f;np.drop=isDrop;np.cardio=false;
+  np.ei=ei;np.si=si;np.f=f;np.drop=isDrop;
   var cur=isDrop?session.exercises[ei].sets[si].drop[f]:session.exercises[ei].sets[si][f];
   np.val=String(cur||'0');
   document.getElementById('np-label').textContent=isDrop?'DROP · '+(f==='w'?'POIDS (KG)':'REPS'):(f==='w'?'POIDS (KG)':'REPS');
@@ -977,8 +983,7 @@ function openNP(ei,si,f,isDrop){
 }
 function npK(k){
   if(k==='.'&&np.val.indexOf('.')>=0) return;
-  if(k==='.'&&!np.cardio&&np.f==='r') return; // no decimal for reps (non-cardio)
-  if(k==='.'&&np.cardio&&(np.f==='marches'||np.f==='niveau')) return; // no decimal for marches/niveau
+  if(k==='.'&&np.f==='r') return; // no decimal for reps
   if(np.val==='0'&&k!=='.') np.val=k;
   else np.val+=k;
   if(np.val.length>6) np.val=np.val.slice(0,6);
@@ -990,16 +995,10 @@ function npDel(){
 }
 function npOK(){
   var val=parseFloat(np.val)||0;
-  if(np.cardio){
-    // no rounding for cardio, keep decimal for vitesse/incl
-    if(np.f==='marches'||np.f==='niveau') val=Math.round(val);
-    session.exercises[np.ei].sets[np.si][np.f]=val;
-    np.cardio=false;
-  } else if(np.drop){
-    if(np.f==='r') val=Math.round(val);
+  if(np.f==='r') val=Math.round(val);
+  if(np.drop){
     session.exercises[np.ei].sets[np.si].drop[np.f]=val;
   } else {
-    if(np.f==='r') val=Math.round(val);
     session.exercises[np.ei].sets[np.si][np.f]=val;
   }
   document.getElementById('numpad').classList.remove('open');
@@ -1182,11 +1181,12 @@ function renderProgram(){
     {label:"PUSH",        color:"#FF6B35", focus:"Pec · Épaules · Triceps"},
     {label:"PULL",        color:"#4ECDC4", focus:"Dos · Biceps · Trapèzes"},
     {label:"LEGS",        color:"#FFE66D", focus:"Quadri · Ischio · Fessiers"},
-    {label:"CARDIO MATIN", color:"#38BDF8", focus:"Marche · Escalier · Course · 60 min enchaîné"},
+    {label:"PUSH + PULL", color:"#C77DFF", focus:"Session mixte complète"},
     null,
     {label:"CARDIO GR",   color:"#6FCF97", focus:"Marche inclinée · Prépa randonnée"},
     null
   ];
+  // Section avant-bras séparée dans programme
   var grDays=Math.ceil((GR_DATE-new Date())/86400000);
   var grPhase, grTip;
   if(grDays>56){grPhase='PHASE 1';grTip='30 min · Inclinaison 6-8% · Sans sac';}
@@ -1252,10 +1252,27 @@ function renderProgram(){
   for(var ci2=0;ci2<consItems.length;ci2++) tips2.push('<div style="display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #111"><div class="bb" style="font-size:12px;color:#6FCF97;width:80px;flex-shrink:0;letter-spacing:1px">'+consItems[ci2][0]+'</div><div style="font-size:12px;color:#444;line-height:1.4">'+consItems[ci2][1]+'</div></div>');
   tips2.push('</div>');
 
+  // AVANT-BRAS section
+  var abH='<div class="card" style="background:#0C0E0A;border-color:#6FCF9740;margin-bottom:10px">';
+  abH+='<div class="bc" style="font-size:9px;color:#6FCF97;letter-spacing:3px;margin-bottom:4px">💪 AVANT-BRAS · SOIR SUR DEUX</div>';
+  abH+='<div class="bb" style="font-size:20px;color:#fff;letter-spacing:2px;margin-bottom:10px">ROUTINE BRAS DE FER</div>';
+  var abExs=SEX["AVANT-BRAS"];
+  for(var ai=0;ai<abExs.length;ai++){
+    var abEx=abExs[ai], abPR=db.prs[abEx.n]?'<div class="bc" style="font-size:10px;color:#FFE66D;margin-top:2px">🏆 PR: '+db.prs[abEx.n]+'</div>':'';
+    abH+='<div style="border-bottom:1px solid #181818;padding:10px 0;display:flex;gap:12px;align-items:flex-start">';
+    abH+='<div class="bb" style="font-size:15px;color:#6FCF97;width:22px;flex-shrink:0">'+(ai+1)+'</div>';
+    abH+='<div style="flex:1"><div class="bc" style="font-size:14px;color:#ddd;letter-spacing:.3px">'+esc(abEx.n)+'</div>';
+    abH+='<div style="font-size:11px;color:#3A3A3A;margin-top:2px">'+esc(abEx.t)+'</div>'+abPR+'</div></div>';
+  }
+  abH+='<div style="background:#181818;border-radius:6px;padding:10px 12px;margin-top:12px">';
+  abH+='<div class="bc" style="font-size:9px;color:#6FCF97;letter-spacing:2px;margin-bottom:6px">LIEN BRAS DE FER</div>';
+  abH+='<div style="font-size:11px;color:#444;line-height:1.5">Pronation = coucher le bras adverse · Supination = résister ou attaquer par le haut · Flexion = verrouiller la prise · Dead hang = préhension brute</div>';
+  abH+='</div></div>';
+
   return '<div class="ai" style="padding:24px 14px">'
     +'<div class="bb" style="font-size:34px;letter-spacing:3px;margin-bottom:2px">PROGRAMME</div>'
-    +'<div class="bc" style="font-size:10px;color:#444;letter-spacing:2px;margin-bottom:16px">STEIL · MASSE + GR PREP · LUN/MAR/MER/JEU/SAM</div>'
-    +weekH+detH+grH+grck+tips2.join('')
+    +'<div class="bc" style="font-size:10px;color:#444;letter-spacing:2px;margin-bottom:16px">STEIL · MASSE + GR PREP · 5 JOURS/SEM</div>'
+    +weekH+detH+abH+grH+grck+tips2.join('')
     +'</div>';
 }
 
